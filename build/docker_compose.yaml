@@ -1,0 +1,27 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ..  # Specifies the directory where the Dockerfile is located
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release  # change to Release in releases
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    restart: unless-stopped
+#    volumes:
+#      - .:/app
+  db:
+    image: postgres:17.4
+    restart: always
+    environment:
+      POSTGRES_DB: FileLab
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
