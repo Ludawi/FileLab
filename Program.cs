@@ -1,28 +1,27 @@
-using FileLab.Data;
+using FileLab.Data.Contexts;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// File Context
+var connectionString = builder.Configuration.GetConnectionString("FileDb")
+    ?? throw new InvalidOperationException("Connection string for FileDb is missing.");
+builder.Services.AddDbContext<FileDbContext>(options => options.UseNpgsql(connectionString));
 
-// Build Auth Context
-
-var contextBuilder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<AuthDbContext>(options =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("AuthDb");
-    options.UseNpgsql(connectionString);
-});
+// Auth Context
+connectionString = builder.Configuration.GetConnectionString("AuthDb")
+    ?? throw new InvalidOperationException("Connection string for AuthDb is missing.");
+builder.Services.AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
 
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<AuthDbContext>();
-
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -64,8 +63,8 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    dbContext.Database.Migrate();
+    var authDbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    authDbContext?.Database.Migrate();
 }
 
 app.MapIdentityApi<IdentityUser>();
@@ -78,11 +77,11 @@ if (app.Environment.IsDevelopment())
 }
 
 
-//app.UseForwardedHeaders(new ForwardedHeadersOptions
-//{
-//    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-//});
-//app.UseHttpsRedirection();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

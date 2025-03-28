@@ -15,7 +15,7 @@ namespace FileLab.Controllers
         [HttpGet]
         public IActionResult Get(int id)
         {
-            FileService.GetFiles();
+            //FileService.GetFiles();
 
             return Ok();
         }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace FileLab.Data
+namespace FileLab.Data.Contexts
 {
     public class AuthDbContext : IdentityDbContext<IdentityUser>
     {
