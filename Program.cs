@@ -1,4 +1,5 @@
 using FileLab.Data.Contexts;
+using FileLab.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ connectionString = builder.Configuration.GetConnectionString("AuthDb")
     ?? throw new InvalidOperationException("Connection string for AuthDb is missing.");
 builder.Services.AddDbContext<AuthDbContext>(options => options.UseNpgsql(connectionString));
 
-
+builder.Services.AddScoped<FileService>();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<AuthDbContext>();
@@ -61,10 +62,11 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+
 using (var scope = app.Services.CreateScope())
 {
-    var authDbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    authDbContext?.Database.Migrate();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    dbContext.Database.Migrate();
 }
 
 app.MapIdentityApi<IdentityUser>();

@@ -1,4 +1,5 @@
-﻿using FileLab.Services;
+﻿using FileLab.Data.Models;
+using FileLab.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FileLab.Controllers
@@ -7,22 +8,25 @@ namespace FileLab.Controllers
     [Route("[controller]")]
     public class FileSystemController : ControllerBase
     {
-        public FileSystemController()
+        private readonly FileService _fileService;
+
+        public FileSystemController(FileService fileService)
         {
+            _fileService = fileService;
         }
 
 
         [HttpGet]
-        public IActionResult Get(int id)
+        public IActionResult GetAllFiles()
         {
-            //FileService.GetFiles();
-
-            return Ok();
+            var files = _fileService.GetFiles();
+            return Ok(files);
         }
 
         [HttpPost]
-        public IActionResult Upload()
+        public async Task<IActionResult> Upload(FileMetadata file)
         {
+            await _fileService.AddFileAsync(file);
             return Ok();
         }
 

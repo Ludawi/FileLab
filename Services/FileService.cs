@@ -15,11 +15,15 @@ namespace FileLab.Services
 
         public List<FileMetadata> GetFiles()
         {
-            return _db.Files.ToList();
+            return _db.Files.ToList() ?? new List<FileMetadata>();
         }
 
         public async Task AddFileAsync(FileMetadata file)
         {
+            file = new FileMetadata
+            {
+                FileName = "Testfile"
+            };
             _db.Files.Add(file);
             await _db.SaveChangesAsync();
         }
