@@ -8,10 +8,9 @@ namespace FileLab.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string FileName { get; set; }
-        public string FilePath { get; set; }
-        public long FileSize { get; set; }
-        public DateTime UploadDate { get; set; }
-
+        public required string FileName { get; set; }
+        public required string FilePath { get; set; }
+        public required long FileSize { get; set; }
+        public required DateTime UploadDate { get; set; }
     }
 }

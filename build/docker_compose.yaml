@@ -5,23 +5,40 @@ services:
       context: ..  # Specifies the directory where the Dockerfile is located
       dockerfile: Dockerfile
       args:
-        BUILD_CONFIGURATION: Release  # change to Release in releases
+        BUILD_CONFIGURATION: Release  # Change to Release in production
     ports:
       - "8080:8080"
       - "8081:8081"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Develo 
+      # - ConnectionStrings__AuthDb=Host=db;Port=5432;Database=AuthDb;Username=postgres;Password=1234pment
     restart: unless-stopped
-#    volumes:
-#      - .:/app
+    networks:
+      - frontend
+      - backend  # Ensures communication with the db service
+
   db:
     image: postgres:17.4
     restart: always
     environment:
-      POSTGRES_DB: FileLab
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: AuthDb
+    networks:
+      - backend
+    ports:  
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:
+
+networks:
+  frontend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+      com.docker.network.bridge.host_binding_ipv6: "::1"
+  backend:
+    driver: bridge  # Change from "custom-driver" to "bridge" (or define a custom plugin)
