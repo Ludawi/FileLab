@@ -2,15 +2,19 @@ using FileLab.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-// Auth Context
+// Build Auth Context
+
+var contextBuilder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AuthDbContext>(options =>
 {
-    options.UseInMemoryDatabase("AuthDb");  // Use SQL db name for next iteration
+    var connectionString = builder.Configuration.GetConnectionString("AuthDb");
+    options.UseNpgsql(connectionString);
 });
 
 builder.Services.AddAuthorization();
