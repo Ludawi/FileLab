@@ -17,7 +17,9 @@ namespace FileLab.Migrations.FileDb
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FileName = table.Column<string>(type: "text", nullable: false)
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    UploadDate = table.Column<DateTime>(type: "timestamp(0) with time zone", nullable: false, defaultValue: DateTime.UtcNow),
+                    LastChanged = table.Column<DateTime>(type: "timestamp(0) with time zone", nullable: false, defaultValue: DateTime.UtcNow)
                 },
                 constraints: table =>
                 {

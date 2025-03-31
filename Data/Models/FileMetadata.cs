@@ -11,7 +11,7 @@ namespace FileLab.Data.Models
         public required string FileName { get; set; }
         //public required string FilePath { get; set; }
         //public required long FileSize { get; set; }
-        //public required DateTime UploadDate { get; set; }
-        //public required DateTime LastChanged { get; set; }
+        public required DateTime UploadDate { get; set; }
+        public required DateTime LastChanged { get; set; }
     }
 }

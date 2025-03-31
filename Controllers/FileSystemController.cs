@@ -1,6 +1,7 @@
 ﻿using FileLab.Data.Models;
 using FileLab.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace FileLab.Controllers
 {
@@ -31,14 +32,16 @@ namespace FileLab.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id)
+        public async Task<IActionResult> Update(int id, FileMetadata file)
         {
+            await _fileService.UpdateFileAsync(id, file);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            await _fileService.DeleteFileAsync(id);
             return Ok();
         }
     }

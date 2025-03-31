@@ -65,8 +65,11 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    dbContext.Database.Migrate();
+    var authDbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    authDbContext.Database.Migrate();
+
+    var fileDbContext = scope.ServiceProvider.GetRequiredService<FileDbContext>();
+    fileDbContext.Database.Migrate();
 }
 
 app.MapIdentityApi<IdentityUser>();
