@@ -36,14 +36,12 @@ namespace FileLab.Services
             await _db.SaveChangesAsync();
         }
 
-        public async Task UpdateFileAsync(int id, FileMetadata file)
+        public async Task RenameFile(int id, string filename)
         {
             var existingFile = _db.Files.FirstOrDefault(f => f.Id == id);
             if (existingFile != null)
             {
-                existingFile.FileName = file.FileName;
-                // existingFile.FilePath = file.FilePath;
-                // existingFile.FileSize = file.FileSize;
+                existingFile.FileName = filename;
                 existingFile.LastChanged = DateTime.UtcNow;
                 await _db.SaveChangesAsync();
             }

@@ -32,9 +32,9 @@ namespace FileLab.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, FileMetadata file)
+        public async Task<IActionResult> Update(int id, string name)
         {
-            await _fileService.UpdateFileAsync(id, file);
+            await _fileService.RenameFile(id, name);
             return Ok();
         }
 
