@@ -1,6 +1,9 @@
 ﻿
 using FileLab.Data.Contexts;
 using FileLab.Data.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FileLab.Services
 {
@@ -18,23 +21,26 @@ namespace FileLab.Services
             return _db.Files.ToList() ?? new List<FileMetadata>();
         }
 
-        public async Task AddFileAsync(FileMetadata file)
+        public async Task<FileMetadata?> GetFileByIdAsync(int id)
         {
-            file = new FileMetadata
+            return await _db.Files.FindAsync(id);
+        }
+
+        public async Task SaveFileAsync(IFormFile file, FileMetadata metadata)
+        {
+            using (var memoryStream = new MemoryStream())
             {
-                FileName = "file1",
-                UploadDate = DateTime.UtcNow,
-                LastChanged = DateTime.UtcNow
-            };
-            _db.Files.Add(file);
+                await file.CopyToAsync(memoryStream);
+                metadata.FileContent = memoryStream.ToArray();
+            }
+
+            metadata.FileName = file.FileName;
+            metadata.UploadDate = DateTime.UtcNow;
+            metadata.LastChanged = DateTime.UtcNow;
+            _db.Files.Add(metadata);
             await _db.SaveChangesAsync();
         }
 
-        public async Task AddFilesAsync(List<FileMetadata> files)
-        {
-            _db.Files.AddRange(files);
-            await _db.SaveChangesAsync();
-        }
 
         public async Task RenameFile(int id, string filename)
         {
@@ -55,6 +61,13 @@ namespace FileLab.Services
                 _db.Files.Remove(file);
                 await _db.SaveChangesAsync();
             }
+        }
+
+        public async Task DeleteAllFilesAsync()
+        {
+            var allFiles = _db.Files.ToList();
+            _db.Files.RemoveRange(allFiles);
+            await _db.SaveChangesAsync();
         }
     }
 }

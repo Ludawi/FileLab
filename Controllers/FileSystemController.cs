@@ -24,11 +24,24 @@ namespace FileLab.Controllers
             return Ok(files);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Upload(FileMetadata file)
+        [HttpGet("download/{id}")]
+        public async Task<IActionResult> DownloadFile(int id)
         {
-            await _fileService.AddFileAsync(file);
-            return Ok();
+            var fileMetadata = await _fileService.GetFileByIdAsync(id);
+            if (fileMetadata == null)
+                return NotFound();
+
+            return File(fileMetadata.FileContent, "application/octet-stream", fileMetadata.FileName);
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadFile([FromForm] IFormFile file, [FromForm] FileMetadata metadata)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File is empty");
+
+            await _fileService.SaveFileAsync(file, metadata);
+            return Ok("File uploaded successfully");
         }
 
         [HttpPut("{id}")]
@@ -43,6 +56,13 @@ namespace FileLab.Controllers
         {
             await _fileService.DeleteFileAsync(id);
             return Ok();
+        }
+
+        [HttpDelete("deleteAll")]
+        public async Task<IActionResult> DeleteAllFiles()
+        {
+            await _fileService.DeleteAllFilesAsync();
+            return Ok("All files deleted successfully");
         }
     }
 }
