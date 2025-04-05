@@ -35,7 +35,7 @@ namespace FileLab.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile([FromForm] IFormFile file, [FromForm] FileMetadata metadata)
+        public async Task<IActionResult> UploadFile(IFormFile file, FileMetadata metadata)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("File is empty");
