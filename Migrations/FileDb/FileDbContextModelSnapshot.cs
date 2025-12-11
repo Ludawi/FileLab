@@ -30,6 +30,10 @@ namespace FileLab.Migrations.FileDb
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<byte[]>("FileContent")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("text");

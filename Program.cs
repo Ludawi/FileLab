@@ -3,11 +3,23 @@ using FileLab.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var _myCorsPolicy = "MyCorsPolicy";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(_myCorsPolicy, policy =>
+    {
+        policy.SetIsOriginAllowed(_ => true)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
+
 
 // File Context
 var connectionString = builder.Configuration.GetConnectionString("FileDb")
@@ -62,34 +74,33 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-
 using (var scope = app.Services.CreateScope())
 {
     var authDbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     authDbContext.Database.Migrate();
-
     var fileDbContext = scope.ServiceProvider.GetRequiredService<FileDbContext>();
     fileDbContext.Database.Migrate();
 }
 
-app.MapIdentityApi<IdentityUser>();
+app.UseCors(_myCorsPolicy);
 
-// Configure the HTTP request pipeline.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+app.UseHttpsRedirection();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapIdentityApi<IdentityUser>();
 app.MapControllers();
 
 app.Run();
